@@ -13,7 +13,7 @@ import SwiftyJSON
 class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
     let baseURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC"
-    let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
+    let currencyArray = ["---","AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
     var finalURL = ""
     let currencySymbolArray = ["$", "R$", "$", "¥", "€", "£", "$", "Rp", "₪", "₹", "¥", "$", "kr", "$", "zł", "lei", "₽", "kr", "$", "$", "R"]
     var currencySymbolTracker = 0
@@ -35,6 +35,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         currencyPicker.delegate = self
         currencyPicker.dataSource = self
         updatePriceButton.isHidden = true
+        currencyPicker.reloadAllComponents()
        
     }
 
@@ -53,20 +54,24 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        finalURL = baseURL + currencyArray[row]
-        print(finalURL)
-        currencySymbolTracker = row
-    
-        updateTimer?.invalidate()
         
-        let localURL = finalURL
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
-            self?.getCurrentBitcoinPrice(url: localURL)
+        if currencyArray[row] != "---" {
+            finalURL = baseURL + currencyArray[row]
+            print(finalURL)
+            currencySymbolTracker = row
+            
+            updateTimer?.invalidate()
+            
+            let localURL = finalURL
+            updateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+                self?.getCurrentBitcoinPrice(url: localURL)
+            }
+            getCurrentBitcoinPrice(url: localURL)
+            
+            
+            updatePriceButton.isHidden = false
         }
-        getCurrentBitcoinPrice(url: localURL)
         
-        
-        updatePriceButton.isHidden = false
 
     }
     
